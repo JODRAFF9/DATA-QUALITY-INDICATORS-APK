@@ -5,7 +5,7 @@ account: jodraff9
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16192212
-bundleId: 11247310
+bundleId: 11248749
 url: https://jodraff9.shinyapps.io/DATA-QUALITY-INDICATORS-APK/
 version: 1
 asMultiple: FALSE

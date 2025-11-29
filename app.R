@@ -203,6 +203,163 @@ hr {
   font-size: 0.8em;
 }
 "
+
+
+# Ajouter ce CSS dans la section tags$head de votre UI
+
+whipple_css <- "
+/* En-tête de section */
+.section-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.section-header p {
+  margin: 5px 0 0 0;
+  opacity: 0.9;
+}
+
+/* Cartes de valeurs */
+.value-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+}
+
+.value-card-header {
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.value-card-header.bg-primary { background: linear-gradient(135deg, #3498db, #2980b9); }
+.value-card-header.bg-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.value-card-header.bg-success { background: linear-gradient(135deg, #27ae60, #229954); }
+.value-card-header.bg-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+.value-card-header.bg-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+
+.value-card-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.value-number {
+  font-size: 2.5em;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.value-label {
+  color: #7f8c8d;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Cartes d'interprétation */
+.interpretation-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.interpretation-header {
+  color: white;
+  padding: 12px 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.interpretation-header.success { background-color: #28a745; }
+.interpretation-header.info { background-color: #17a2b8; }
+.interpretation-header.warning { background-color: #ffc107; color: #212529; }
+.interpretation-header.danger { background-color: #dc3545; }
+
+.interpretation-body {
+  padding: 15px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Boîte d'information */
+.info-box {
+  background: #e8f4fd;
+  border-left: 4px solid #3498db;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.info-title {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-box li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.info-box b {
+  color: #3498db;
+}
+
+/* Titres */
+.section-title {
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .value-number {
+    font-size: 2em;
+  }
+  
+  .section-header {
+    padding: 15px;
+  }
+  
+  .section-header h3 {
+    font-size: 1.3em;
+  }
+}
+"
+
+# N'oubliez pas d'ajouter ce CSS dans votre UI :
+#
 ####################################################################################
 ##########################################################################################
 ##########################################################################################
@@ -214,6 +371,7 @@ ui <- fluidPage(
   # Inclusion du CSS personnalisé
   tags$head(
     tags$style(HTML(custom_css)),
+    tags$head(tags$style(HTML(whipple_css))),
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"),
     tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap")
   ),
