@@ -9,91 +9,362 @@ library(plotly)
 # Charger les fonctions
 source("FUNCTIONS.R")
 
+# CSS personnalisé
+custom_css <- "
+/* Styles généraux */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* En-tête */
+.navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 0;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: white !important;
+  font-size: 1.5em;
+}
+
+/* Panneau latéral */
+.sidebar {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 10px;
+}
+
+.well {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Boutons */
+.btn-primary {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+/* Onglets */
+.nav-tabs > li > a {
+  color: #555;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+  margin-right: 5px;
+}
+
+.nav-tabs > li.active > a {
+  background-color: #3498db;
+  color: white;
+  border: none;
+}
+
+/* Cartes de contenu */
+.tab-content {
+  background-color: white;
+  border-radius: 0 8px 8px 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-height: 500px;
+}
+
+/* Indicateurs */
+.help-block {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Tableaux */
+.dataTables_wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Graphiques */
+.plotly.html-widget {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Notifications */
+.shiny-notification {
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* En-têtes */
+h3, h4 {
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+h4 {
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+  margin-top: 20px;
+}
+
+/* Icônes dans les titres */
+.fa, .fas, .far {
+  margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    margin: 5px;
+    padding: 15px;
+  }
+  
+  .tab-content {
+    padding: 15px;
+    margin: 5px;
+  }
+}
+
+/* Animation de chargement */
+.shiny-progress-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
+.shiny-progress .progress {
+  height: 8px;
+  margin-bottom: 0;
+}
+
+.shiny-progress .bar {
+  background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+/* Amélioration des contrôles */
+.form-control {
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.form-control:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Checkboxes et radios */
+.checkbox, .radio {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.checkbox-inline, .radio-inline {
+  margin-right: 15px;
+}
+
+/* Séparateurs */
+hr {
+  border-top: 1px solid #e0e0e0;
+  margin: 20px 0;
+}
+
+/* Badges pour les indicateurs */
+.badge {
+  background-color: #3498db;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+}
+"
+####################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+
 ui <- fluidPage(
-  titlePanel("📊 Analyse de la Qualité des Données Démographiques"),
+  
+  # Inclusion du CSS personnalisé
+  tags$head(
+    tags$style(HTML(custom_css)),
+    tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"),
+    tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap")
+  ),
+  
+  # HTML pour l'en-tête amélioré
+  tags$div(class = "navbar",
+           tags$div(class = "container-fluid",
+                    tags$div(class = "navbar-header",
+                             tags$h1(class = "navbar-brand",
+                                     tags$i(class = "fas fa-chart-line"), 
+                                     "📊 Analyse de la Qualité des Données Démographiques"
+                             )
+                    )
+           )
+  ),
   
   sidebarLayout(
     sidebarPanel(
+      class = "sidebar",
+      
       # Upload de fichier
-      fileInput("file1", "📁 Choisir un fichier Excel",
-                accept = c(".xlsx", ".xls"),
-                buttonLabel = "Parcourir..."),
-      
-      # Informations
-      tags$hr(),
-      helpText("✅ Le fichier doit contenir les colonnes : AGE, Homme, Femme, Total"),
-      
-      # Sélection des indicateurs
-      tags$hr(),
-      h4("🎯 Indicateurs à calculer"),
-      checkboxGroupInput("indicateurs", "",
-                         choices = c("Indice de Whipple" = "whipple",
-                                     "Indice de Myers" = "myers",
-                                     "Indice de Bachi" = "bachi",
-                                     "Indice combiné Nations Unies" = "nu"),
-                         selected = c("whipple", "myers", "bachi", "nu")),
-      
-      # Paramètres pyramide
-      tags$hr(),
-      h4("👥 Pyramide des âges"),
-      radioButtons("type_pyramide", "Type:",
-                   choices = c("Âge simple" = "simple",
-                               "Groupée" = "grouped"),
-                   selected = "simple"),
-      
-      conditionalPanel(
-        condition = "input.type_pyramide == 'grouped'",
-        sliderInput("largeur_groupe", "Largeur groupe (années):",
-                    min = 1, max = 10, value = 5, step = 1)
+      tags$div(class = "well",
+               tags$h4(tags$i(class = "fas fa-file-upload"), "📁 Import des données"),
+               fileInput("file1", "Choisir un fichier Excel",
+                         accept = c(".xlsx", ".xls"),
+                         buttonLabel = "Parcourir...",
+                         placeholder = "Aucun fichier sélectionné"),
+               
+               tags$div(class = "help-block",
+                        tags$i(class = "fas fa-info-circle"),
+                        "✅ Le fichier doit contenir les colonnes : AGE, Homme, Femme, Total"
+               )
       ),
       
-      numericInput("age_max", "Âge maximum:", value = 80, min = 10, max = 120),
+      # Sélection des indicateurs
+      tags$div(class = "well",
+               tags$h4(tags$i(class = "fas fa-chart-bar"), "Indicateurs à calculer"),
+               checkboxGroupInput("indicateurs", "",
+                                  choices = c(
+                                    "Indice de Whipple" = "whipple",
+                                    "Indice de Myers" = "myers", 
+                                    "Indice de Bachi" = "bachi",
+                                    "Indice combiné Nations Unies" = "nu"
+                                  ),
+                                  selected = c("whipple", "myers", "bachi", "nu"))
+      ),
+      
+      # Paramètres pyramide
+      tags$div(class = "well",
+               tags$h4(tags$i(class = "fas fa-chart-pie"), "Pyramide des âges"),
+               radioButtons("type_pyramide", "Type:",
+                            choices = c("Âge simple" = "simple",
+                                        "Groupée" = "grouped"),
+                            selected = "simple"),
+               
+               conditionalPanel(
+                 condition = "input.type_pyramide == 'grouped'",
+                 sliderInput("largeur_groupe", "Largeur groupe (années):",
+                             min = 1, max = 10, value = 5, step = 1)
+               ),
+               
+               numericInput("age_max", "Âge maximum:", value = 80, min = 10, max = 120)
+      ),
       
       # Boutons d'action
-      tags$hr(),
-      actionButton("calculate", "🧮 Calculer les indicateurs", 
-                   class = "btn-primary", width = "100%"),
-      actionButton("plot_pyramid", "📈 Générer pyramide", 
-                   class = "btn-success", width = "100%"),
+      tags$div(class = "well",
+               tags$h4(tags$i(class = "fas fa-cogs"), "Actions"),
+               actionButton("calculate", "Calculer les indicateurs", 
+                            class = "btn-primary", width = "100%"),
+               tags$br(), tags$br(),
+               actionButton("plot_pyramid", "Générer pyramide", 
+                            class = "btn-success", width = "100%")
+      ),
       
       # Téléchargement
-      tags$hr(),
-      downloadButton("downloadResults", "💾 Télécharger résultats", width = "100%"),
-      downloadButton("downloadPyramid", "🖼️ Télécharger pyramide", width = "100%")
+      tags$div(class = "well",
+               tags$h4(tags$i(class = "fas fa-download"), "Téléchargement"),
+               downloadButton("downloadResults", "💾 Télécharger résultats", 
+                              class = "btn-primary", width = "100%"),
+               tags$br(), tags$br(),
+               downloadButton("downloadPyramid", " Télécharger pyramide", 
+                              class = "btn-success", width = "100%")
+      )
     ),
     
     mainPanel(
       tabsetPanel(
-        tabPanel("📋 Données", 
-                 DTOutput("contents")),
+        id = "main_tabs",
         
-        tabPanel("🔢 Whipple",
-                 verbatimTextOutput("whipple_results"),
-                 plotOutput("whipple_plot")),
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-table"), "Données"),
+          DTOutput("contents")
+        ),
         
-        tabPanel("📊 Myers",
-                 verbatimTextOutput("myers_results"),
-                 plotOutput("myers_plot")),
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-calculator"), "Whipple"),
+          tags$div(class = "result-card",
+                   verbatimTextOutput("whipple_results"),
+                   plotOutput("whipple_plot")
+          )
+        ),
         
-        tabPanel("🎯 Bachi",
-                 verbatimTextOutput("bachi_results"),
-                 plotOutput("bachi_plot")),
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-chart-line"), "Myers"),
+          tags$div(class = "result-card",
+                   verbatimTextOutput("myers_results"),
+                   plotOutput("myers_plot")
+          )
+        ),
         
-        tabPanel("🌍 Nations Unies",
-                 verbatimTextOutput("nu_results"),
-                 plotOutput("nu_plot")),
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-bullseye"), "Bachi"),
+          tags$div(class = "result-card",
+                   verbatimTextOutput("bachi_results"),
+                   plotOutput("bachi_plot")
+          )
+        ),
         
-        tabPanel("👥 Pyramide",
-                 plotlyOutput("pyramid_plot"),
-                 DTOutput("pyramid_data")),
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-globe-americas"), "Nations Unies"),
+          tags$div(class = "result-card",
+                   verbatimTextOutput("nu_results"),
+                   plotOutput("nu_plot")
+          )
+        ),
         
-        tabPanel("📑 Rapport complet",
-                 verbatimTextOutput("full_report"))
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-chart-bar"), "Pyramide"),
+          tags$div(class = "result-card",
+                   plotlyOutput("pyramid_plot"),
+                   DTOutput("pyramid_data")
+          )
+        ),
+        
+        tabPanel(
+          title = tags$span(tags$i(class = "fas fa-file-alt"), " Rapport complet"),
+          tags$div(class = "result-card",
+                   verbatimTextOutput("full_report")
+          )
+        )
       )
     )
   )
 )
 
+####################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
+# Le serveur reste identique au code précédent
 server <- function(input, output) {
   
   # Chargement des données
@@ -301,7 +572,7 @@ server <- function(input, output) {
     cat("=== INDICE DE MYERS ===\n\n")
     
     print_myers <- function(nom, data) {
-      cat("🔹 ", nom, ":\n", sep = "")
+      cat(nom, ":\n", sep = "")
       cat("   Indice :", round(data$indice, 3), "\n")
       cat("   Tu     :", round(data$Tu, 1), "\n\n")
     }
@@ -310,7 +581,7 @@ server <- function(input, output) {
     print_myers("FEMME", results()$myers$femme)
     print_myers("ENSEMBLE", results()$myers$ensemble)
     
-    cat("📊 Interprétation:\n")
+    cat("Interprétation:\n")
     cat("• ≈0  = Déclarations d'âge exactes\n")
     cat("• >0  = Préférences pour certains chiffres\n")
     cat("• 180 = Maximum (un seul chiffre préféré)\n")
@@ -339,7 +610,7 @@ server <- function(input, output) {
     cat("=== INDICE DE BACHI ===\n\n")
     
     print_bachi <- function(nom, data) {
-      cat("🔹 ", nom, ":\n", sep = "")
+      cat(nom, ":\n", sep = "")
       cat("   Indice :", round(data$indice, 3), "\n")
       cat("   ru (%) :", round(data$ru, 1), "\n\n")
     }
@@ -381,18 +652,18 @@ server <- function(input, output) {
       cat("Correction S         :", round(results()$nu$S_correction, 2), "\n")
     }
     
-    cat("\n🎯 QUALITÉ DES DONNÉES:\n")
+    cat("\n QUALITÉ DES DONNÉES:\n")
     net <- results()$nu$I_net
     if (net < 20) {
-      cat("✅ EXCELLENTE qualité (indice < 20)\n")
+      cat("EXCELLENTE qualité (indice < 20)\n")
     } else if (net < 40) {
-      cat("👍 BONNE qualité (indice 20-40)\n")
+      cat("BONNE qualité (indice 20-40)\n")
     } else if (net < 60) {
-      cat("⚠️  Qualité ACCEPTABLE (indice 40-60)\n")
+      cat("Qualité ACCEPTABLE (indice 40-60)\n")
     } else if (net < 80) {
-      cat("📉 Qualité MÉDIOCRE (indice 60-80)\n")
+      cat("Qualité MÉDIOCRE (indice 60-80)\n")
     } else {
-      cat("❌ TRÈS MAUVAISE qualité (indice > 80)\n")
+      cat("TRÈS MAUVAISE qualité (indice > 80)\n")
     }
   })
   
