@@ -1,414 +1,58 @@
+#######################################Librairies###############################
 library(shiny)
 library(DT)
 library(readxl)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(plotly)
+library(plotly) 
 
-# Charger les fonctions
-source("FUNCTIONS.R")
-
-# CSS personnalisé
-custom_css <- "
-/* Styles généraux */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
-}
-
-/* En-tête */
-.navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 0;
-}
-
-.navbar-brand {
-  font-weight: bold;
-  color: white !important;
-  font-size: 1.5em;
-}
-
-/* Panneau latéral */
-.sidebar {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin: 10px;
-}
-
-.well {
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Boutons */
-.btn-primary {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-}
-
-.btn-success {
-  background: linear-gradient(135deg, #27ae60, #229954);
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
-}
-
-/* Onglets */
-.nav-tabs > li > a {
-  color: #555;
-  font-weight: 600;
-  border-radius: 8px 8px 0 0;
-  margin-right: 5px;
-}
-
-.nav-tabs > li.active > a {
-  background-color: #3498db;
-  color: white;
-  border: none;
-}
-
-/* Cartes de contenu */
-.tab-content {
-  background-color: white;
-  border-radius: 0 8px 8px 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  min-height: 500px;
-}
-
-/* Indicateurs */
-.help-block {
-  color: #666;
-  font-size: 0.9em;
-}
-
-/* Tableaux */
-.dataTables_wrapper {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* Graphiques */
-.plotly.html-widget {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Notifications */
-.shiny-notification {
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-/* En-têtes */
-h3, h4 {
-  color: #2c3e50;
-  font-weight: 700;
-}
-
-h4 {
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 5px;
-  margin-top: 20px;
-}
-
-/* Icônes dans les titres */
-.fa, .fas, .far {
-  margin-right: 8px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar {
-    margin: 5px;
-    padding: 15px;
-  }
-  
-  .tab-content {
-    padding: 15px;
-    margin: 5px;
-  }
-}
-
-/* Animation de chargement */
-.shiny-progress-container {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 9999;
-}
-
-.shiny-progress .progress {
-  height: 8px;
-  margin-bottom: 0;
-}
-
-.shiny-progress .bar {
-  background: linear-gradient(90deg, #3498db, #2980b9);
-}
-
-/* Amélioration des contrôles */
-.form-control {
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-}
-
-.form-control:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-}
-
-/* Checkboxes et radios */
-.checkbox, .radio {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.checkbox-inline, .radio-inline {
-  margin-right: 15px;
-}
-
-/* Séparateurs */
-hr {
-  border-top: 1px solid #e0e0e0;
-  margin: 20px 0;
-}
-
-/* Badges pour les indicateurs */
-.badge {
-  background-color: #3498db;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 0.8em;
-}
-"
-
-
-# Ajouter ce CSS dans la section tags$head de votre UI
-
-whipple_css <- "
-/* En-tête de section */
-.section-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.section-header h3 {
-  margin: 0;
-  font-weight: 700;
-}
-
-.section-header p {
-  margin: 5px 0 0 0;
-  opacity: 0.9;
-}
-
-/* Cartes de valeurs */
-.value-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.3s ease;
-  margin-bottom: 15px;
-}
-
-.value-card:hover {
-  transform: translateY(-5px);
-}
-
-.value-card-header {
-  color: white;
-  padding: 15px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1.1em;
-}
-
-.value-card-header.bg-primary { background: linear-gradient(135deg, #3498db, #2980b9); }
-.value-card-header.bg-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-.value-card-header.bg-success { background: linear-gradient(135deg, #27ae60, #229954); }
-.value-card-header.bg-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
-.value-card-header.bg-info { background: linear-gradient(135deg, #17a2b8, #138496); }
-
-.value-card-body {
-  padding: 20px;
-  text-align: center;
-}
-
-.value-number {
-  font-size: 2.5em;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 5px;
-}
-
-.value-label {
-  color: #7f8c8d;
-  font-size: 0.9em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Cartes d'interprétation */
-.interpretation-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-bottom: 15px;
-}
-
-.interpretation-header {
-  color: white;
-  padding: 12px 15px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.interpretation-header.success { background-color: #28a745; }
-.interpretation-header.info { background-color: #17a2b8; }
-.interpretation-header.warning { background-color: #ffc107; color: #212529; }
-.interpretation-header.danger { background-color: #dc3545; }
-
-.interpretation-body {
-  padding: 15px;
-  font-weight: 500;
-  text-align: center;
-}
-
-/* Boîte d'information */
-.info-box {
-  background: #e8f4fd;
-  border-left: 4px solid #3498db;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 20px 0;
-}
-
-.info-title {
-  color: #2c3e50;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.info-box ul {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.info-box li {
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.info-box b {
-  color: #3498db;
-}
-
-/* Titres */
-.section-title {
-  color: #2c3e50;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .value-number {
-    font-size: 2em;
-  }
-  
-  .section-header {
-    padding: 15px;
-  }
-  
-  .section-header h3 {
-    font-size: 1.3em;
-  }
-}
-"
-
-# N'oubliez pas d'ajouter ce CSS dans votre UI :
-#
-####################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
-
-
+##################################Fonctions#####################################
+source("functions.R")
+source("css.R")
+#######################################UI#######################################
 ui <- fluidPage(
-  
-  # Inclusion du CSS personnalisé
+  ######Inclusion du CSS personnalisé################
   tags$head(
     tags$style(HTML(custom_css)),
-    tags$head(tags$style(HTML(whipple_css))),
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"),
     tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap")
   ),
-  
-  # HTML pour l'en-tête amélioré
+  ######HTML pour l'en-tête amélioré#################
   tags$div(class = "navbar",
            tags$div(class = "container-fluid",
                     tags$div(class = "navbar-header",
                              tags$h1(class = "navbar-brand",
                                      tags$i(class = "fas fa-chart-line"), 
-                                     "📊 Analyse de la Qualité des Données Démographiques"
+                                     "ANALYSE DE LA QUALITE DES DONNEES DEMOGRAPHIQUES"
                              )
                     )
            )
   ),
-  
   sidebarLayout(
+
     sidebarPanel(
       class = "sidebar",
       
-      # Upload de fichier
+      ###############Upload de fichier avec icône animée#################
       tags$div(class = "well",
-               tags$h4(tags$i(class = "fas fa-file-upload"), "📁 Import des données"),
+               tags$h4(icon("file-upload", class = "fa-pulse"), "📁 Import des données"),
                fileInput("file1", "Choisir un fichier Excel",
                          accept = c(".xlsx", ".xls"),
-                         buttonLabel = "Parcourir...",
+                         buttonLabel = tags$span(icon("folder-open"), "Parcourir vos fichiers ..."),
                          placeholder = "Aucun fichier sélectionné"),
                
                tags$div(class = "help-block",
-                        tags$i(class = "fas fa-info-circle"),
-                        "✅ Le fichier doit contenir les colonnes : AGE, Homme, Femme, Total"
+                        icon("info-circle"),
+                        "✅ Formats acceptés : .xlsx, .xls Le fichier doit contenir les colonnes : Age Homme, Femme, Total"
                )
       ),
-      
-      # Sélection des indicateurs
+      ################Indicateurs avec compteur##################
       tags$div(class = "well",
-               tags$h4(tags$i(class = "fas fa-chart-bar"), "Indicateurs à calculer"),
+               tags$h4(icon("chart-bar"), "Indicateurs à calculer"),
+               tags$div(style = "font-size: 20px; color: #6c757d; margin-bottom: 10px;",
+                        "Sélectionner: ", textOutput("nb_indicateurs", inline = TRUE)
+               ),
                checkboxGroupInput("indicateurs", "",
                                   choices = c(
                                     "Indice de Whipple" = "whipple",
@@ -419,95 +63,111 @@ ui <- fluidPage(
                                   selected = c("whipple", "myers", "bachi", "nu"))
       ),
       
-      # Paramètres pyramide
+      #######Pyramide avec aperçu#####
       tags$div(class = "well",
-               tags$h4(tags$i(class = "fas fa-chart-pie"), "Pyramide des âges"),
+               tags$h4(icon("chart-pie"), "Pyramide des âges"),
                radioButtons("type_pyramide", "Type:",
-                            choices = c("Âge simple" = "simple",
-                                        "Groupée" = "grouped"),
+                            choices = c(
+                              "Âge simple" = "simple",
+                              "Âges groupés" = "grouped"
+                            ),
                             selected = "simple"),
                
                conditionalPanel(
                  condition = "input.type_pyramide == 'grouped'",
                  sliderInput("largeur_groupe", "Largeur groupe (années):",
-                             min = 1, max = 10, value = 5, step = 1)
+                             min = 1, max = 10, value = 5, step = 1,
+                             ticks = TRUE)
                ),
                
-               numericInput("age_max", "Âge maximum:", value = 80, min = 10, max = 120)
+               numericInput("age_max", "Âge maximum affiché:", 
+                            value = 80, min = 10, max = 120, step = 5)
       ),
       
-      # Boutons d'action
+      ################Boutons avec indicateurs de statut###############
       tags$div(class = "well",
-               tags$h4(tags$i(class = "fas fa-cogs"), "Actions"),
-               actionButton("calculate", "Calculer les indicateurs", 
+               tags$h4(icon("cogs"), "Actions"),
+               actionButton("calculate", 
+                            tags$span(icon("calculator"), " Calculer les indicateurs"), 
                             class = "btn-primary", width = "100%"),
                tags$br(), tags$br(),
-               actionButton("plot_pyramid", "Générer pyramide", 
-                            class = "btn-success", width = "100%")
+               actionButton("plot_pyramid", 
+                            tags$span(icon("chart-bar"), " Générer pyramide"), 
+                            class = "btn-success", width = "100%"),
+               
+               # Indicateurs de statut
+               tags$div(style = "margin-top: 10px;",
+                        uiOutput("status_indicateurs"),
+                        uiOutput("status_pyramide")
+               )
       ),
       
-      # Téléchargement
+      ################Téléchargement avec formats###############
       tags$div(class = "well",
-               tags$h4(tags$i(class = "fas fa-download"), "Téléchargement"),
-               downloadButton("downloadResults", "💾 Télécharger résultats", 
+               tags$h4(icon("download"), "💾 Export des résultats"),
+               downloadButton("downloadResults", 
+                              tags$span(icon("file-excel"), " Résultats Excel"), 
                               class = "btn-primary", width = "100%"),
                tags$br(), tags$br(),
-               downloadButton("downloadPyramid", " Télécharger pyramide", 
-                              class = "btn-success", width = "100%")
+               downloadButton("downloadPyramid", 
+                              tags$span(icon("file-image"), " Graphique PNG"), 
+                              class = "btn-success", width = "100%"),
+               
+               tags$div(class = "help-block",
+                        icon("info-circle"),
+                        "Formats: Excel (.xlsx), Image (.png)"
+               )
       )
     ),
-    
+
     mainPanel(
+      class = "main-panel-container", 
       tabsetPanel(
         id = "main_tabs",
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-table"), "Données"),
-          DTOutput("contents")
+          title = tags$span(icon("table"), "Données"),
+          DTOutput("contents")  
         ),
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-calculator"), "Whipple"),
+          title = tags$span(icon("calculator"), "Whipple"),
           tags$div(class = "result-card",
-                   verbatimTextOutput("whipple_results"),
-                   plotOutput("whipple_plot")
-          )
+                   DTOutput("whipple_results")
+                   )
         ),
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-chart-line"), "Myers"),
+          title = tags$span(icon("chart-line"), "Myers"),
           tags$div(class = "result-card",
-                   verbatimTextOutput("myers_results"),
-                   plotOutput("myers_plot")
-          )
+                   DTOutput("myers_results")
+                  )
         ),
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-bullseye"), "Bachi"),
+          title = tags$span(icon("bullseye"), "Bachi"),
           tags$div(class = "result-card",
-                   verbatimTextOutput("bachi_results"),
-                   plotOutput("bachi_plot")
-          )
+                   verbatimTextOutput("bachi_results")
+                  )
         ),
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-globe-americas"), "Nations Unies"),
+          title = tags$span(icon("globe-americas"), "Nations Unies"),
           tags$div(class = "result-card",
-                   verbatimTextOutput("nu_results"),
-                   plotOutput("nu_plot")
-          )
+                   verbatimTextOutput("nu_results")
+                  )
         ),
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-chart-bar"), "Pyramide"),
+          title = tags$span(icon("chart-bar"), "Pyramide"),
           tags$div(class = "result-card",
                    plotlyOutput("pyramid_plot"),
                    DTOutput("pyramid_data")
-          )
+                  )
         ),
         
         tabPanel(
-          title = tags$span(tags$i(class = "fas fa-file-alt"), " Rapport complet"),
+          title = tags$span(icon("file-alt"), "Rapport complet"),
           tags$div(class = "result-card",
                    verbatimTextOutput("full_report")
           )
@@ -517,18 +177,11 @@ ui <- fluidPage(
   )
 )
 
-####################################################################################
-##########################################################################################
-##########################################################################################
-##########################################################################################
-
-# Le serveur reste identique au code précédent
+#######################################SERVER#######################################
 server <- function(input, output) {
-  
-  # Chargement des données
+  ############Chargement des données#################
   data <- reactive({
     req(input$file1)
-    
     tryCatch({
       df <- read_excel(input$file1$datapath)
       return(df)
@@ -537,21 +190,19 @@ server <- function(input, output) {
       return(NULL)
     })
   })
-  
-  # Affichage des données
+  ###########Affichage des données################
   output$contents <- renderDT({
     req(data())
     datatable(data(), 
               options = list(scrollX = TRUE, pageLength = 10),
               caption = "Données chargées")
   })
+  ###########Préparation des données complètes################
   
-  # Préparation des données complètes
   donnees_completes <- reactive({
     req(data())
-    
-    df_complet <- data.frame(age = 0:99) %>%
-      left_join(data() %>% rename(age = AGE), by = "age") %>%
+
+    df_complet <- data() %>% rename(age = Age) %>%
       mutate(
         Homme = ifelse(is.na(Homme), 0, Homme),
         Femme = ifelse(is.na(Femme), 0, Femme),
@@ -560,8 +211,8 @@ server <- function(input, output) {
     
     return(df_complet)
   })
-  
-  # Données pour pyramide
+  ############Données pour pyramide###############
+
   pyramid_data <- reactive({
     req(donnees_completes(), input$age_max)
     
@@ -595,8 +246,8 @@ server <- function(input, output) {
     
     return(df_long)
   })
-  
-  # Création pyramide
+  ###############Création pyramide#############
+
   create_pyramid <- function() {
     req(pyramid_data())
     
@@ -609,7 +260,7 @@ server <- function(input, output) {
                         labels = c("Homme" = "Hommes", "Femme" = "Femmes")) +
       coord_flip() +
       labs(title = paste("Pyramide des âges -", 
-                         ifelse(input$type_pyramide == "simple", "Âge simple", "Groupée")),
+                         ifelse(input$type_pyramide == "simple", "Âge simple", "Groupés")),
            x = "Âge", y = "Effectif", fill = "Sexe") +
       scale_y_continuous(labels = function(x) format(abs(x), big.mark = " ")) +
       theme_minimal() +
@@ -617,20 +268,20 @@ server <- function(input, output) {
             plot.title = element_text(hjust = 0.5, face = "bold"))
     
     ggplotly(p, tooltip = "text") %>% 
-      layout(legend = list(orientation = "h", x = 0.3, y = -0.1))
+      layout(legend = list(orientation = "h", x = 0, y = -0.15))
   }
-  
-  # Affichage pyramide
+
+  ################Affichage pyramide###############
   output$pyramid_plot <- renderPlotly({
     req(input$plot_pyramid)
     create_pyramid()
   })
-  
-  # Données pyramide
+
+  ################Données pyramide###############
   output$pyramid_data <- renderDT({
     req(pyramid_data())
     
-    data_table <- pyramid_data() %>%
+    data_table <- pyramid_data() %>% rename(Age = age ) %>%
       mutate(Effectif = abs(Effectif)) %>%
       pivot_wider(names_from = Sexe, values_from = Effectif)
     
@@ -638,8 +289,7 @@ server <- function(input, output) {
               options = list(scrollX = TRUE, pageLength = 10),
               caption = "Données de la pyramide des âges")
   })
-  
-  # Calcul indicateurs
+  ################Calcul indicateurs###############
   results <- eventReactive(input$calculate, {
     req(data(), donnees_completes())
     
@@ -647,24 +297,24 @@ server <- function(input, output) {
     
     results_list <- list()
     
-    # Whipple
+    ################Whipple###############
     if("whipple" %in% input$indicateurs) {
       results_list$whipple <- indice_whipple(data())
     }
     
-    # Myers
+    ################Myers###############
     if("myers" %in% input$indicateurs) {
       results_list$myers <- indice_myers(data())
     }
     
-    # Bachi
+    ################Bachi###############
     if("bachi" %in% input$indicateurs) {
       results_list$bachi <- indice_bachi(donnees_completes()$Homme, donnees_completes()$Femme)
     }
     
-    # Nations Unies
+    ################Nations Unies###############
     if("nu" %in% input$indicateurs) {
-      # Préparer données quinquennales
+      ################Préparer données quinquennales###############
       groupes <- data.frame(
         age = 0:99,
         groupe = cut(0:99, breaks = seq(0, 100, 5), right = FALSE, labels = FALSE)
@@ -691,22 +341,42 @@ server <- function(input, output) {
     return(results_list)
   })
   
-  # Affichage résultats Whipple
-  output$whipple_results <- renderPrint({
+  
+  
+  ########Affichage résultats Whipple###############
+  output$whipple_results <- renderDT({
     req(results()$whipple)
     
-    cat("=== INDICE DE WHIPPLE ===\n\n")
-    cat("Homme    :", round(results()$whipple$homme, 3), "\n")
-    cat("Femme    :", round(results()$whipple$femme, 3), "\n")
-    cat("Ensemble :", round(results()$whipple$ensemble, 3), "\n\n")
+    whipple <- results()$whipple
     
-    cat("📊 Interprétation:\n")
-    cat("• 1.000 = Aucune attraction/répulsion\n")
-    cat("• 5.000 = Tous les âges terminent par 0 ou 5\n")
-    cat("• <1.000 = Répulsion pour ces âges\n")
+    df <- data.frame(
+      Groupe = c("Hommes", "Femmes", "Ensemble"),
+      Indice = c(whipple$homme, whipple$femme, whipple$ensemble),
+      Écart = c(whipple$homme - 1, whipple$femme - 1, whipple$ensemble - 1),
+      stringsAsFactors = FALSE
+    )
+    
+    datatable(df, 
+              options = list(dom = 't', pageLength = 5),
+              rownames = FALSE) %>%
+      formatRound(columns = c('Indice', 'Écart'), digits = 3) %>%
+      formatStyle(
+        'Indice',
+        backgroundColor = styleInterval(
+          c(0.9, 1.1, 1.2),
+          c('#FDD', '#FFD', '#DDF5DD', '#FCC')
+        )
+      ) %>%
+      formatStyle(
+        'Écart',
+        color = styleInterval(
+          c(-0.1, 0.1, 0.2),
+          c('#B22222', '#DAA520', '#006400', '#DAA520')
+        )
+      )
   })
   
-  # Graphique Whipple
+  ################Graphique Whipple###############
   output$whipple_plot <- renderPlot({
     req(results()$whipple)
     
@@ -721,31 +391,53 @@ server <- function(input, output) {
       labs(title = "Indice de Whipple par sexe", y = "Valeur de l'indice") +
       scale_fill_manual(values = c("Homme" = "#3498db", "Femme" = "#e74c3c", "Ensemble" = "#2ecc71")) +
       theme_minimal()
-  })
-  
-  # Affichage résultats Myers
-  output$myers_results <- renderPrint({
+  })  
+  ################Affichage résultats Myers###############
+  output$myers_results <- renderDT({
     req(results()$myers)
     
-    cat("=== INDICE DE MYERS ===\n\n")
+    myers <- results()$myers
     
-    print_myers <- function(nom, data) {
-      cat(nom, ":\n", sep = "")
-      cat("   Indice :", round(data$indice, 3), "\n")
-      cat("   Tu     :", round(data$Tu, 1), "\n\n")
-    }
+
+    # Ajouter une ligne pour l'indice total (en caractère aussi)
+    df_total <- data.frame(
+      Chiffre = "INDICE TOTAL",
+      Hommes = round(myers$homme$indice, 3),
+      Femmes = round(myers$femme$indice, 3),
+      Ensemble = round(myers$ensemble$indice, 3),
+      stringsAsFactors = FALSE
+    )
     
-    print_myers("HOMME", results()$myers$homme)
-    print_myers("FEMME", results()$myers$femme)
-    print_myers("ENSEMBLE", results()$myers$ensemble)
+    # Créer un dataframe avec tous les chiffres terminaux
+    df <- data.frame(
+      Chiffre = as.character(0:9),
+      Hommes = round(myers$homme$indiceU,3),
+      Femmes = round(myers$femme$indiceU,3),
+      Ensemble = round(myers$ensemble$indiceU,3),
+      stringsAsFactors = FALSE
+    )
     
-    cat("Interprétation:\n")
-    cat("• ≈0  = Déclarations d'âge exactes\n")
-    cat("• >0  = Préférences pour certains chiffres\n")
-    cat("• 180 = Maximum (un seul chiffre préféré)\n")
+    df <- bind_rows(df, df_total)
+
+    datatable(df,
+              options = list(
+                dom = 't',
+                pageLength = 11
+              ),
+              rownames = FALSE,
+              caption = "Distribution des chiffres terminaux - Indice de Myers") %>%
+      formatStyle(
+        'Chiffre',
+        target = 'row',
+        backgroundColor = styleEqual(
+          "INDICE TOTAL", '#F5F5F5'
+        ),
+        fontWeight = styleEqual(
+          "INDICE TOTAL", 'bold'
+        )
+      ) 
   })
-  
-  # Graphique Myers
+  ################Graphique Myers###############
   output$myers_plot <- renderPlot({
     req(results()$myers)
     
@@ -760,8 +452,7 @@ server <- function(input, output) {
       scale_fill_manual(values = c("Homme" = "#3498db", "Femme" = "#e74c3c", "Ensemble" = "#2ecc71")) +
       theme_minimal()
   })
-  
-  # Affichage résultats Bachi
+  ################Affichage résultats Bachi###############
   output$bachi_results <- renderPrint({
     req(results()$bachi)
     
@@ -777,7 +468,7 @@ server <- function(input, output) {
     print_bachi("FÉMININ", results()$bachi$feminin)
   })
   
-  # Graphique Bachi
+  ###############Graphique Bachi###############
   output$bachi_plot <- renderPlot({
     req(results()$bachi)
     
@@ -795,8 +486,7 @@ server <- function(input, output) {
       scale_fill_manual(values = c("Homme" = "#3498db", "Femme" = "#e74c3c")) +
       theme_minimal()
   })
-  
-  # Affichage résultats Nations Unies
+  #########Affichage résultats Nations Unies###############
   output$nu_results <- renderPrint({
     req(results()$nu)
     
@@ -824,8 +514,8 @@ server <- function(input, output) {
       cat("TRÈS MAUVAISE qualité (indice > 80)\n")
     }
   })
-  
-  # Graphique Nations Unies
+
+  ################Graphique Nations Unies###############
   output$nu_plot <- renderPlot({
     req(results()$nu)
     
@@ -840,8 +530,7 @@ server <- function(input, output) {
       scale_fill_brewer(palette = "Set2") +
       theme_minimal()
   })
-  
-  # Rapport complet
+  ################Rapport complet###############
   output$full_report <- renderPrint({
     req(results())
     
@@ -849,7 +538,7 @@ server <- function(input, output) {
     cat("Date :", format(Sys.Date(), "%d/%m/%Y"), "\n")
     cat("Fichier :", input$file1$name, "\n\n")
     
-    # Whipple
+    ################Whipple###############
     if(!is.null(results()$whipple)) {
       cat("1. INDICE DE WHIPPLE:\n")
       cat("   • Homme    :", round(results()$whipple$homme, 3), "\n")
@@ -857,7 +546,7 @@ server <- function(input, output) {
       cat("   • Ensemble :", round(results()$whipple$ensemble, 3), "\n\n")
     }
     
-    # Myers
+    ################Myers###############
     if(!is.null(results()$myers)) {
       cat("2. INDICE DE MYERS:\n")
       cat("   • Homme    :", round(results()$myers$homme$indice, 3), "\n")
@@ -865,14 +554,14 @@ server <- function(input, output) {
       cat("   • Ensemble :", round(results()$myers$ensemble$indice, 3), "\n\n")
     }
     
-    # Bachi
+    ################Bachi###############
     if(!is.null(results()$bachi)) {
       cat("3. INDICE DE BACHI:\n")
       cat("   • Masculin :", round(results()$bachi$masculin$indice, 3), "\n")
       cat("   • Féminin  :", round(results()$bachi$feminin$indice, 3), "\n\n")
     }
     
-    # Nations Unies
+    ################Nations Unies###############
     if(!is.null(results()$nu)) {
       cat("4. INDICE COMBINÉ NATIONS UNIES:\n")
       cat("   • Indice net :", round(results()$nu$I_net, 2), "\n")
@@ -887,8 +576,7 @@ server <- function(input, output) {
     
     cat("\n--- FIN DU RAPPORT ---\n")
   })
-  
-  # Téléchargement résultats
+  ################Téléchargement résultats###############
   output$downloadResults <- downloadHandler(
     filename = function() {
       paste("resultats-qualite-", Sys.Date(), ".txt", sep = "")
@@ -901,8 +589,7 @@ server <- function(input, output) {
       }), file)
     }
   )
-  
-  # Téléchargement pyramide
+  ################Téléchargement pyramide###############
   output$downloadPyramid <- downloadHandler(
     filename = function() {
       paste("pyramide-ages-", Sys.Date(), ".html", sep = "")

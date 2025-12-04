@@ -1,19 +1,19 @@
 library(dplyr)
 library(tidyr)
 
-# Indice de Whipple complet
+####################Indice de Whipple####################
 indice_whipple <- function(data) {
   # Validation des données
-  if (!all(c("AGE", "Homme", "Femme", "Total") %in% names(data))) {
-    stop("Colonnes manquantes: AGE, Homme, Femme, Total")
+  if (!all(c("Age", "Homme", "Femme", "Total") %in% names(data))) {
+    stop("Colonnes manquantes: Age, Homme, Femme, Total")
   }
   
   # Âges se terminant par 0 ou 5 entre 23 et 62 ans
-  ages_0_5 <- data$AGE[data$AGE >= 23 & data$AGE <= 62 & (data$AGE %% 5 == 0)]
+  ages_0_5 <- data$Age[data$Age >= 23 & data$Age <= 62 & (data$Age %% 5 == 0)]
   
   calc_whipple <- function(population) {
-    A <- sum(population[data$AGE %in% ages_0_5], na.rm = TRUE)
-    B <- sum(population[data$AGE >= 23 & data$AGE <= 62], na.rm = TRUE)
+    A <- sum(population[data$Age %in% ages_0_5], na.rm = TRUE)
+    B <- sum(population[data$Age >= 23 & data$Age <= 62], na.rm = TRUE)
     if (B == 0) return(0)
     return(5 * A / B)
   }
@@ -27,12 +27,12 @@ indice_whipple <- function(data) {
   return(result)
 }
 
-# Indice de Myers complet
+#####################Indice de Myers####################
 indice_myers <- function(data) {
   calc_myers <- function(population) {
     # Filtrer âges >= 10 ans
-    ages_10plus <- data$AGE >= 10
-    ages <- data$AGE[ages_10plus]
+    ages_10plus <- data$Age >= 10
+    ages <- data$Age[ages_10plus]
     eff <- population[ages_10plus]
     
     if (sum(eff, na.rm = TRUE) == 0) {
@@ -45,8 +45,8 @@ indice_myers <- function(data) {
     })
     
     # Filtrer âges >= 20 ans pour S'u
-    ages_20plus <- data$AGE >= 20
-    ages2 <- data$AGE[ages_20plus]
+    ages_20plus <- data$Age >= 20
+    ages2 <- data$Age[ages_20plus]
     eff2 <- population[ages_20plus]
     
     Su_prime <- sapply(0:9, function(u) {
@@ -63,9 +63,10 @@ indice_myers <- function(data) {
     if (T_total == 0) return(list(indice = 0, Tu = Tu))
     
     pourcentages <- 100 * Tu / T_total
-    indice <- sum(abs(pourcentages - 10))
+    indiceU <- abs(pourcentages - 10)
+    indice <- sum(abs(indiceU))
     
-    return(list(indice = indice, Tu = Tu))
+    return(list(indice = indice, Tu = Tu,indiceU = indiceU))
   }
   
   return(list(
@@ -75,9 +76,9 @@ indice_myers <- function(data) {
   ))
 }
 
-# Indice de Bachi complet
+#####################Indice de Bachi####################
 indice_bachi <- function(pop_m, pop_f) {
-  calcul_bachi <- function(pop) {
+  calc_bachi <- function(pop) {
     # Vérifier la longueur
     if (length(pop) < 78) {
       pop <- c(pop, rep(0, 78 - length(pop)))
@@ -129,12 +130,12 @@ indice_bachi <- function(pop_m, pop_f) {
   }
   
   return(list(
-    masculin = calcul_bachi(pop_m),
-    feminin = calcul_bachi(pop_f)
+    masculin = calc_bachi(pop_m),
+    feminin = calc_bachi(pop_f)
   ))
 }
 
-# Indice combiné Nations Unies complet
+#####################Indice combiné Nations Unies complet####################
 indice_combine_nu <- function(pop_m_quinquenal, pop_f_quinquenal, taille_population = NULL) {
   n <- length(pop_m_quinquenal)
   
@@ -145,7 +146,7 @@ indice_combine_nu <- function(pop_m_quinquenal, pop_f_quinquenal, taille_populat
   }
   
   # Calcul des rapports de groupes d'âge
-  calcul_rapports <- function(pop) {
+  calc_rapports <- function(pop) {
     rapports <- numeric(n - 2)
     for (i in 2:(n - 1)) {
       denom <- pop[i-1] + pop[i+1]
@@ -158,8 +159,8 @@ indice_combine_nu <- function(pop_m_quinquenal, pop_f_quinquenal, taille_populat
     return(rapports)
   }
   
-  m_rapports <- calcul_rapports(pop_m_quinquenal)
-  f_rapports <- calcul_rapports(pop_f_quinquenal)
+  m_rapports <- calc_rapports(pop_m_quinquenal)
+  f_rapports <- calc_rapports(pop_f_quinquenal)
   
   # Indices d'irrégularité
   J_m <- mean(abs(m_rapports - 100), na.rm = TRUE)
